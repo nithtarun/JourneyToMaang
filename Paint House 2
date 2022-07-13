@@ -1,0 +1,138 @@
+Description
+There are a row of n houses, each house can be painted with one of the k colors. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+
+The cost of painting each house with a certain color is represented by a n x k cost matrix. For example, costs[0][0] is the cost of painting house 0 with color 0; costs[1][2] is the cost of painting house 1 with color 2, and so on... Find the minimum cost to paint all houses.
+
+All costs are positive integers.
+
+Example
+Example 1
+
+Input:
+costs = [[14,2,11],[11,14,5],[14,3,10]]
+Output: 10
+Explanation:
+The three house use color [1,2,1] for each house. The total cost is 10.
+Example 2
+
+Input:
+costs = [[5]]
+Output: 5
+Explanation:
+There is only one color and one house.
+Challenge
+Could you solve it in O(nk)
+
+
+
+Solution : 2 approaches
+public class Solution {
+    /**
+     * @param costs: n x k cost matrix
+     * @return: an integer, the minimum cost to paint all houses
+     */
+
+    /*
+    
+    Optimised one with TC O(n*k)
+    as searching for min value in prev col increases our TC by curr TC * k
+    so in order to reduce it we will find min & second min variable, so as to 
+    reduce TC if value of prev col is same as min only then use second min
+    
+    */
+
+    public int minCostII(int[][] costs) {
+        // write your code here
+
+        int n = costs.length;
+        if(n==0) return 0;
+        int k = costs[0].length;
+        
+        int prevMin = Integer.MAX_VALUE, prevSecondMin = Integer.MAX_VALUE;
+        
+        for(int j = 0 ; j < k ; j++) {
+            if(prevMin>costs[0][j]) {
+                prevSecondMin = prevMin;
+                prevMin = costs[0][j];
+            } else if(prevSecondMin>costs[0][j]) {
+                prevSecondMin = costs[0][j];
+            }
+        }
+
+        for(int i = 1 ; i < n ; i++) {
+            int min = Integer.MAX_VALUE, secondMin = Integer.MAX_VALUE;
+            for(int j = 0 ; j < k ; j++) {
+                int least = (prevMin!=costs[i-1][j]) ? prevMin : prevSecondMin;
+                costs[i][j] = costs[i][j] + least;
+                
+                if(min>costs[i][j]) {
+                    secondMin = min;
+                    min = costs[i][j];
+                } else if(secondMin>costs[i][j]) {
+                    secondMin = costs[i][j];
+                }
+            }
+            prevMin = min;
+            prevSecondMin = secondMin;
+        }
+
+        int min = Integer.MAX_VALUE;
+        for(int a = 0; a < k;a++)
+        {    
+            min = Math.min(min,costs[n-1][a]);
+        }
+        return min;
+
+    }
+
+    public int canPaint(int i,int j,int k,int[][] costs) {
+        int min = Integer.MAX_VALUE;
+        for(int a = 0; a < k;a++)
+        {    
+            if(j!=a) {
+                min = Math.min(min,costs[i-1][a]);
+            } 
+        }
+        return min;
+    }
+
+    /*
+
+    TC O(n*k*k)
+
+    public int minCostII(int[][] costs) {
+        // write your code here
+
+        int n = costs.length;
+        if(n==0) return 0;
+        int k = costs[0].length;
+        
+
+        for(int i = 1 ; i < n ; i++) {
+            for(int j = 0 ; j < k ; j++) {
+                costs[i][j] = costs[i][j] + canPaint(i,j,k,costs);
+            }
+        }
+
+        int min = Integer.MAX_VALUE;
+        for(int a = 0; a < k;a++)
+        {    
+            min = Math.min(min,costs[n-1][a]);
+        }
+        return min;
+
+    }
+
+    public int canPaint(int i,int j,int k,int[][] costs) {
+        int min = Integer.MAX_VALUE;
+        for(int a = 0; a < k;a++)
+        {    
+            if(j!=a) {
+                min = Math.min(min,costs[i-1][a]);
+            } 
+        }
+        return min;
+    }
+
+    */
+}
